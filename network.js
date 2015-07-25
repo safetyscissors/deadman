@@ -1,1 +1,0 @@
-logger("network manager loaded");
