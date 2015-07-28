@@ -21,6 +21,21 @@ function exampleTurn() {
 /* ************************************************************* *\
  * functions
 \* ************************************************************* */
+function checkRemainingWords(){
+  //check if we have a wordList
+  if(!data.wordList){
+    requestWordFindData(data.blanks, function(rawHtml){
+      data.wordList = getWordListFromHtml(rawHtml);
+
+      //re call itself to process the data
+      return checkRemainingWords();
+    })
+  }else{
+    data.wordList = wordsLessGuessedLetters(data.guesses, data.wordList);
+    logger(data.wordList.join(','));
+  }
+}
+
 function requestWordFindData(wordArray, callback){
 	wordArray = _.map(wordArray, function(word){
 		return word || '?'
