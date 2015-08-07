@@ -2,7 +2,7 @@
  * initialize script
 \* --------------------------------------------- */
 function logger(msg){
-	console.log(msg);
+	console.log('[logger]',msg);
 }
 
 initData();
@@ -21,8 +21,8 @@ $('#raw')[0].oninput = function(){
 	//save and reset input field
 	data.guesses.push(getGuessFromFront());
 	checkRemainingWords();
-	//do action on the changed data
-	updateFront();
+
+	//update front to say thinking. dont update result until computer is done thinking.
 };
 
 /* -------------------------------------------- *\
@@ -31,7 +31,7 @@ $('#raw')[0].oninput = function(){
 function initData(){
 	//creates a property called guesses and makes it an array
 	data.guesses = [];
-	data.blanks = new Array(3);
+	data.blanks = ['','',''];
 
 	updateFront();
 }
@@ -70,6 +70,9 @@ function getGuessFromFront(){
 	var guess = $('#guess').val();
 	if(!guess) return;
 
+	//disable input for next guess until the computer is done thinking.
+	$('#guess').attr('disabled','disabled');
+
 	//log and return the guess.
 	logger('input added guess:' + guess);
 	return guess;
@@ -95,4 +98,8 @@ function updateFront(){
 		blankMsg += blankValue + ' ';
 	});
 	$('#blanks').html(blankMsg);
+
+	//allow for next guess again.
+	$('#guess').removeAttr('disabled');
+	$('#guess').focus();
 }

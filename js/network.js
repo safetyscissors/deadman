@@ -21,6 +21,43 @@ function exampleTurn() {
 /* ************************************************************* *\
  * functions
 \* ************************************************************* */
+function hypothesize(callback){
+  var guessesCopy = data.guesses.slice(0);
+  var lastGuess = guessesCopy.pop();
+  var bestHypothesis = {
+    wordList:[]
+  };
+
+  async.forEachOf(data.blanks,
+    //iterator
+    function iterator(item, key, eachCallback){
+      var blanksCopy = data.blanks.slice(0);
+      if(blanksCopy[key]) return eachCallback();
+
+      blanksCopy[key] = lastGuess;
+      requestWordFindData(blanksCopy, function(rawHtml){
+        //get the next set of words
+        var wordList = getWordListFromHtml(rawHtml);
+        wordList = wordsLessGuessedLetters(guessesCopy, wordList);
+
+        //save if its best option.
+        if(wordList.length>bestHypothesis.wordList.length){
+          bestHypothesis.wordList = wordList;
+          bestHypothesis.guesses = guessesCopy;
+          bestHypothesis.blanks = blanksCopy;
+        }
+
+        eachCallback();
+      });
+    },
+    //on complete
+    function done(eachError){
+      callback(eachError, bestHypothesis);
+    }
+  );
+}
+
+
 function checkRemainingWords(){
   //check if we have a wordList
   if(!data.wordList){
@@ -31,8 +68,25 @@ function checkRemainingWords(){
       return checkRemainingWords();
     })
   }else{
-    data.wordList = wordsLessGuessedLetters(data.guesses, data.wordList);
-    logger(data.wordList.join(','));
+
+    //default next state;
+    var nextState = {
+      blanks:data.blanks,
+      guesses:data.guesses,
+      wordList:wordsLessGuessedLetters(data.guesses, data.wordList)
+    };
+
+    //consider giving up the letter if there are fewer possibilities
+    hypothesize(function(error, bestHypothesis){
+      if(error) console.log(error);
+      if(bestHypothesis.wordList.length > nextState.wordList.length) nextState = bestHypothesis;
+      logger('hypothesis: ' + JSON.stringify(bestHypothesis));
+      logger('nextState: ' + JSON.stringify(nextState));
+
+      //change data then do visual action
+      data = nextState;
+      updateFront();
+    });
   }
 }
 
