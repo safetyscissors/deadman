@@ -72,6 +72,7 @@ function getGuessFromFront(){
 
 	//disable input for next guess until the computer is done thinking.
 	$('#guess').attr('disabled','disabled');
+	$('#speech').addClass('disabled');
 
 	//log and return the guess.
 	logger('input added guess:' + guess);
@@ -102,4 +103,5 @@ function updateFront(){
 	//allow for next guess again.
 	$('#guess').removeAttr('disabled');
 	$('#guess').focus();
+	$('#speech').removeClass('disabled');
 }
