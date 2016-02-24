@@ -39,10 +39,14 @@ function dictionaryReplace(letter){
     '8':'a',
     'be':'b',
     'beat':'b',
+    'see':'c',
+    'sea':'c',
     'eat':'e',
+    'el':'l',
     'cay':'k',
     'oh':'o',
     'okay':'o',
+    'are':'r',
     'you':'u',
     'why':'y'
   };
